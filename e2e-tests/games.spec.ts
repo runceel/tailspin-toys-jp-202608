@@ -24,6 +24,15 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by category and publisher', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('category-filter-1').check();
+    await page.getByTestId('publisher-filter').selectOption('1');
+    await page.getByTestId('apply-filters').click();
+    await expect(page).toHaveURL(/category=1.*publisher=1/);
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(1);
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
