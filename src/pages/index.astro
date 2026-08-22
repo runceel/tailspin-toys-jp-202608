@@ -4,11 +4,13 @@ import GameCard from '../components/GameCard.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
 import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
+import { getAllCategories, getAllGames, getAllPublishers } from '../lib/games';
 
 export const prerender = true;
 
 const games = await getAllGames(getDatabase());
+const filterCategories = await getAllCategories(getDatabase());
+const filterPublishers = await getAllPublishers(getDatabase());
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
@@ -21,13 +23,55 @@ const games = await getAllGames(getDatabase());
     <div>
       <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
 
+      <form class="mb-8 rounded-xl border border-slate-700 bg-slate-800/60 p-6" method="get" data-testid="game-filters">
+        <div class="grid gap-6 md:grid-cols-2">
+          <fieldset>
+            <legend class="mb-3 font-medium text-slate-100">Categories</legend>
+            <div class="grid gap-2 sm:grid-cols-2">
+              {filterCategories.map((category) => (
+                <label class="flex items-center gap-2 text-slate-300">
+                  <input type="checkbox" name="category" value={category.id} class="h-4 w-4 rounded border-slate-600 bg-slate-900 text-blue-500 focus:ring-2 focus:ring-blue-500" data-testid={`category-filter-${category.id}`} />
+                  <span>{category.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div>
+            <label for="publisher-filter" class="mb-3 block font-medium text-slate-100">Publisher</label>
+            <select id="publisher-filter" name="publisher" class="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none" data-testid="publisher-filter">
+              <option value="">All publishers</option>
+              {filterPublishers.map((publisher) => <option value={publisher.id}>{publisher.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="mt-6 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none" data-testid="apply-filters">Apply filters</button>
+        <a href="/" class="ml-4 text-sm text-slate-300 underline hover:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" data-testid="clear-filters">Clear filters</a>
+      </form>
+
       {games.length === 0 ? (
         <EmptyState text="No games available at the moment." />
       ) : (
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+          {games.map((game) => <div data-filter-category={game.category?.id} data-filter-publisher={game.publisher?.id}><GameCard game={game} /></div>)}
         </div>
       )}
+      <p class="hidden text-slate-300" data-testid="no-filter-results">No games match the selected filters.</p>
     </div>
   </div>
 </Layout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const categories = new Set(params.getAll('category'));
+  const publisher = params.get('publisher') ?? '';
+  document.querySelectorAll<HTMLInputElement>('input[name="category"]').forEach((input) => {
+    input.checked = categories.has(input.value);
+  });
+  const publisherInput = document.querySelector<HTMLSelectElement>('select[name="publisher"]');
+  if (publisherInput) publisherInput.value = publisher;
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-filter-category]')];
+  const visible = cards.filter((card) => (!categories.size || categories.has(card.dataset.filterCategory ?? '')) && (!publisher || card.dataset.filterPublisher === publisher));
+  cards.forEach((card) => { card.hidden = !visible.includes(card); });
+  const empty = document.querySelector<HTMLElement>('[data-testid="no-filter-results"]');
+  if (empty) empty.classList.toggle('hidden', visible.length !== 0);
+</script>
