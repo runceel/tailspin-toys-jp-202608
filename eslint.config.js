@@ -39,5 +39,14 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
     },
+    rules: {
+      // Keep TypeScript formatting consistent without requiring a separate formatter.
+      quotes: ["error", "single", { avoidEscape: true }],
+      semi: ["error", "always"],
+      "comma-dangle": ["error", "always-multiline"],
+      "object-curly-spacing": ["error", "always"],
+      "arrow-parens": ["error", "always"],
+      "eol-last": ["error", "always"],
+    },
   },
 ];

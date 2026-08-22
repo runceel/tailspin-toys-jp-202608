@@ -45,7 +45,7 @@ test.describe('Accessibility Tests', () => {
     await test.step('Tab until the menu button is focused', async () => {
       for (let i = 0; i < 20; i++) {
         await page.keyboard.press('Tab');
-        if (await menuButton.evaluate(el => el === document.activeElement)) break;
+        if (await menuButton.evaluate((el) => el === document.activeElement)) break;
       }
       await expect(menuButton).toBeFocused();
     });
@@ -58,10 +58,10 @@ test.describe('Accessibility Tests', () => {
     await test.step('Verify menu items are reachable', async () => {
       const homeLink = menu.getByRole('link', { name: /home/i });
       // Focus may already be on the first menu item after opening
-      if (!await homeLink.evaluate(el => el === document.activeElement)) {
+      if (!await homeLink.evaluate((el) => el === document.activeElement)) {
         for (let i = 0; i < 10; i++) {
           await page.keyboard.press('Tab');
-          if (await homeLink.evaluate(el => el === document.activeElement)) break;
+          if (await homeLink.evaluate((el) => el === document.activeElement)) break;
         }
       }
       await expect(homeLink).toBeFocused();
@@ -69,7 +69,7 @@ test.describe('Accessibility Tests', () => {
       const aboutLink = menu.getByRole('link', { name: /about/i });
       for (let i = 0; i < 10; i++) {
         await page.keyboard.press('Tab');
-        if (await aboutLink.evaluate(el => el === document.activeElement)) break;
+        if (await aboutLink.evaluate((el) => el === document.activeElement)) break;
       }
       await expect(aboutLink).toBeFocused();
     });
@@ -182,7 +182,7 @@ test.describe('Accessibility Tests', () => {
     
     // Filter for color contrast violations
     const contrastViolations = accessibilityScanResults.violations.filter(
-      violation => violation.id === 'color-contrast'
+      (violation) => violation.id === 'color-contrast',
     );
     
     expect(contrastViolations).toEqual([]);
