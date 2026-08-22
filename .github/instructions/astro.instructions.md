@@ -106,6 +106,12 @@ const game = await getGameById(getDatabase(), Number(id));
 
 There is no Svelte/React layer. When a page genuinely needs client behaviour, add a scoped Astro `<script>` using standard DOM APIs. Prefer native interactive elements (`<button>`, `<a href>`) so keyboard and focus behaviour come for free.
 
+## Comments and Component Documentation
+
+- Comments should explain intent, constraints, or non-obvious decisions rather than restating markup or script logic.
+- Keep comments current; update or remove stale comments when changing the related component.
+- Every reusable component must document its `Props` interface, including the meaning of each public prop.
+
 ## TypeScript
 
 - Use TypeScript for type-safe props

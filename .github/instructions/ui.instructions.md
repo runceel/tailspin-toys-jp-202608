@@ -20,6 +20,12 @@ Refer to technology-specific instruction files:
 
 ## Core Principles
 
+### Comments and Documentation
+
+- Comments explain why code exists, its intent, or a non-obvious decision; do not paraphrase implementation details.
+- Keep comments current with the code and remove them when they no longer add context.
+- Document every reusable component's `Props` interface so its public API is clear to callers.
+
 ### Testability
 
 - Every interactive element MUST include a `data-testid` attribute
